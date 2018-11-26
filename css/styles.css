@@ -105,6 +105,7 @@ ul li small {
 
 #events .event-date-details {
   flex: 1 0 70%;
+  margin-left: 20px;
 }
 
 #events .event-date-details div {
@@ -205,6 +206,3 @@ ul li small {
   top: 50%;
   left: 50%;
 }
-
-
-
