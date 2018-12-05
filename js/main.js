@@ -1,4 +1,114 @@
 (function () {
+
+  function convertDay(date) {
+    let day = new Date(date).toLocaleDateString('es-ES', {weekday: 'long'});
+    return capitalizeDay(day);
+  }
+  
+  function capitalizeDay(day) {
+    let array = day.split('');
+    const firstLetter = day[0].toUpperCase();
+    array.splice(0, 1, firstLetter);
+    return array.join('');
+  }
+
+  function splitDate(date, type) {
+    const splitter = date.split('-');
+    if (type === 'year') {
+      return splitter[0];
+    } else if (type === 'month') {
+      let day = new Date(date).toLocaleDateString('es-ES', {month: 'long'});
+      return capitalizeDay(day);
+    } else {
+      return splitter[2];
+    }
+  }
+
+  function formatTime (time) {
+    if (time == null) { // take advantage of == type coercion
+      return 'Hora por confirmar';
+    } else {
+      const colon = time.lastIndexOf(':');
+      return time.slice(0, colon);
+    }
+  }
+
+  function closeModal($event) {
+    console.log($event.target.parentElement.parentElement.style.display = 'none');
+  }
+
+  function searchLocation(idEvent) {
+
+    const eventDetails = document.querySelector('.event-details');
+
+    const divModal = document.createElement('DIV');
+    divModal.setAttribute('class', 'modal');
+    divModal.style.display = 'block';
+    eventDetails.appendChild(divModal);
+
+    const modal = document.querySelector('.modal');
+    const divModalContent = document.createElement('DIV');
+    divModalContent.setAttribute('class', 'modal-content');
+    modal.appendChild(divModalContent);
+
+    const modalContent = document.querySelector('.modal-content');
+
+    const span = document.createElement('SPAN');
+    span.setAttribute('class', 'close');
+    span.addEventListener('click', closeModal, false);
+    span.textContent = 'X';
+    modalContent.appendChild(span);
+
+    const h1 = document.createElement('H1');
+    modalContent.appendChild(h1);
+
+    const h3 = document.createElement('H3');
+    modalContent.appendChild(h3);
+
+    const p1 = document.createElement('P');
+    const p2 = document.createElement('P');
+    const p3 = document.createElement('P');
+    modalContent.appendChild(p1);
+    modalContent.appendChild(p2);
+    modalContent.appendChild(p3);
+
+    const divMap = document.createElement('DIV');
+    divMap.setAttribute('id', 'map');
+    divMap.style.display = 'block';
+    modalContent.appendChild(divMap);
+
+    callApis('https://api.songkick.com/api/3.0/venues/ ' + idEvent + '.json?apikey=' + config.API_SK, function (data) {
+
+      console.log(data);
+
+      const event = data.results.venue;
+
+      if (event.lat !== null && event.lng !== null) {
+
+        divModal.querySelector('h1').textContent = event.displayName;
+        divModal.querySelector('h3').textContent = event.street + ' - ' + event.zip;
+        let pes = divModal.querySelectorAll('p');
+        pes[0].textContent = event.phone;
+        pes[1].textContent = event.website;
+        pes[2].textContent = event.city.country.displayName;
+
+        const location = {lat: event.lat, lng: event.lng};
+        const map = new google.maps.Map(divMap, {
+          zoom: 12,
+          center: location
+        });
+        const marker = new google.maps.Marker({
+          position: location,
+          map: map,
+          title: event.street
+        });
+      } else {
+        divModal.firstElementChild.children[1].textContent = 'No podemos mostrar la ubicación en el mapa';
+      }
+    });
+
+  }
+
   function artistDetails(id) {
 
     const spinner = document.querySelector('.spinner');
@@ -77,7 +187,7 @@
         eventDetailsVenue.textContent = item.venue.displayName;
         eventCityCountry.textContent = item.location.city;
         button.addEventListener('click', function () {
-          //TODO searchLocation(item.venue.id);
+          searchLocation(item.venue.id);
         }, false);
       });
 
