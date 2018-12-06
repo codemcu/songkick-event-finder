@@ -62,6 +62,11 @@
     console.log($event.target.parentElement.parentElement.style.display = 'none');
   }
 
+  /**
+   * @description muestra u oculta el spinner con css dependiendo de si el state es show o no
+   * @param {string} si es show, aplica 'block' a display, en otro caso, 'none'
+   * @return void
+   */
   function toggleSpinner(state) {
     const spinner = document.querySelector('.spinner');
     let css = spinner.style;
