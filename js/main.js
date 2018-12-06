@@ -302,50 +302,59 @@
 
       arrayResults.forEach(function (artist) {
 
-        orderListArtistByEvents(artist);
+        _orderListArtistByEvents(artist, ul, ulNoEvents);
 
       });
     } else {
       toggleSpinner('hide');
     }
 
-    function orderListArtistByEvents (artist) {
-      const path = 'artists/' + artist.id + '/calendar.json?apikey=' + config.API_SK;
-      const url = urlBase + path;
+  }
 
-      callApis(url, function (event) {
+  /**
+   * @description coloca más arriba los artistas con número total de eventos > 0 y debajo los que no
+   * @param {Object} artist - contiene el nombre y el id del artista
+   * @param {HTMLElement} ul - contenedor para los artistas con numero de eventos > 0
+   * @param {HTMLElement} ulNoEvents - contenedor para los artidtas cuyo número de eventos sea = 0
+   * @return void
+   * @private
+   */
+  function _orderListArtistByEvents (artist, ul, ulNoEvents) {
+    const path = 'artists/' + artist.id + '/calendar.json?apikey=' + config.API_SK;
+    const url = urlBase + path;
 
-        toggleSpinner('hide');
+    callApis(url, function (event) {
 
-        if (event.totalEntries > 0) {
+      toggleSpinner('hide');
 
-          const li = createTagAndSetStyle('LI', 'list-artist-link');
-          const text = document.createTextNode(artist.displayName);
-          li.appendChild(text);
-          ul.insertBefore(li, ul.firstChild);
+      if (event.totalEntries > 0) {
 
-          const small = document.createElement('SMALL');
-          const totalEvents = document.createTextNode(event.totalEntries + ' eventos encontrados');
-          small.appendChild(totalEvents);
-          li.appendChild(small);
+        const li = createTagAndSetStyle('LI', 'list-artist-link');
+        const text = document.createTextNode(artist.displayName);
+        li.appendChild(text);
+        ul.insertBefore(li, ul.firstChild);
 
-          document.querySelector('.list-artist-link').addEventListener('click', function () {
-            artistDetails(artist.id);
-          }, false);
+        const small = document.createElement('SMALL');
+        const totalEvents = document.createTextNode(event.totalEntries + ' eventos encontrados');
+        small.appendChild(totalEvents);
+        li.appendChild(small);
 
-        } else {
-          const li = document.createElement('LI');
-          const text = document.createTextNode(artist.displayName);
-          li.appendChild(text);
-          ulNoEvents.appendChild(li);
+        document.querySelector('.list-artist-link').addEventListener('click', function () {
+          artistDetails(artist.id);
+        }, false);
 
-          const small = document.createElement('SMALL');
-          const totalEvents = document.createTextNode(event.totalEntries + ' eventos encontrados');
-          small.appendChild(totalEvents);
-          li.appendChild(small);
-        }
-      });
-    }
+      } else {
+        const li = document.createElement('LI');
+        const text = document.createTextNode(artist.displayName);
+        li.appendChild(text);
+        ulNoEvents.appendChild(li);
+
+        const small = document.createElement('SMALL');
+        const totalEvents = document.createTextNode(event.totalEntries + ' eventos encontrados');
+        small.appendChild(totalEvents);
+        li.appendChild(small);
+      }
+    });
   }
 
   /**
