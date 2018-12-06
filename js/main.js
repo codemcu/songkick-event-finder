@@ -5,23 +5,20 @@
   /**
    * @description convierte un día a formato local, (wednesday -> miércoles)
    * @param {string} date - día a convertir
-   * @param {string} day - día a convertir
+   * @return {Function} capitalizeFirstLetter
    */
   function convertDay(date) {
     let day = new Date(date).toLocaleDateString('es-ES', {weekday: 'long'});
-    return capitalizeDay(day);
+    return capitalizeFirstLetter(day);
   }
 
   /**
    * @description capitaliza el día de la semana
-   * @param {string} - day, día de semana
-   * @return {string} array convertido a string
+   * @param {string} day, día de semana
+   * @return {string} string
    */
-  function capitalizeDay(day) {
-    let array = day.split('');
-    const firstLetter = day[0].toUpperCase();
-    array.splice(0, 1, firstLetter);
-    return array.join('');
+  function capitalizeFirstLetter(day) {
+    return day.charAt(0).toUpperCase() + day.slice(1);
   }
 
   /**
@@ -36,7 +33,7 @@
       return splitter[0];
     } else if (type === 'month') {
       let day = new Date(date).toLocaleDateString('es-ES', {month: 'long'});
-      return capitalizeDay(day);
+      return capitalizeFirstLetter(day);
     } else {
       return splitter[2];
     }
