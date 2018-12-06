@@ -173,7 +173,7 @@
 
     callApis(url, function (data) {
 
-      toggleSpinner('false');
+      toggleSpinner('hide');
 
       const listOfEvents = data.results.event;
 
@@ -252,6 +252,17 @@
   }
 
   /**
+   * @description crea un nodeElement y le asigna una clase de CSS
+   * @param {string} tagName - nombre de la etiqueta
+   * @param {string} className - nombre de la clase de CSS
+   * @return {HTMLElement} 
+   */
+  function createTagAndSetStyle(tagName, className) {
+    const tag = document.createElement(tagName);
+    tag.classList.add(className);
+    return tag;
+  }
+  /**
    * @description crea la la lista de artistas (ul > li) que coincidan con la búsqueda
    * @param {Response} data - respuesta del servidor
    * @param data.results.artist - contiene el array con todos los artistas
@@ -261,30 +272,26 @@
   function createListArtist(data) {
 
     toggleSpinner('show');
-
-    const container = document.querySelector('.container');
-    const events = document.createElement('DIV');
-    events.setAttribute('class', 'events');
-    container.appendChild(events);
-
-    const listArtist = document.createElement('DIV');
-    listArtist.setAttribute('class', 'list-artist');
-    events.appendChild(listArtist);
-
-    const listArtistNoEvents = document.createElement('DIV');
-    listArtistNoEvents.setAttribute('class', 'list-artist-noEvents');
-    events.appendChild(listArtistNoEvents);
-
     const arrayResults = data.results.artist;
     const totalEntries = data.totalEntries;
+
+    const container = document.querySelector('.container');
+
+    const events = createTagAndSetStyle('DIV', 'events');
+    container.appendChild(events);
+
+    const listArtist = createTagAndSetStyle('DIV', 'list-artist');
+    events.appendChild(listArtist);
+
+    const listArtistNoEvents = createTagAndSetStyle('DIV', 'list-artist-noEvents');
+    events.appendChild(listArtistNoEvents);
 
     const ul = document.createElement('UL');
     const ulNoEvents = document.createElement('UL');
 
-    const spanTotalEntries = document.createElement('SPAN');
+    const spanTotalEntries = createTagAndSetStyle('SPAN', 'total-entries');
     let spanText = document.createTextNode(totalEntries + ' resultados coinciden con tu búsqueda');
     spanTotalEntries.appendChild(spanText);
-    spanTotalEntries.classList.add('total-entries');
     listArtist.appendChild(spanTotalEntries);
 
     if (arrayResults && arrayResults.length > 0) {
@@ -294,46 +301,49 @@
 
       arrayResults.forEach(function (artist) {
 
-        const path = 'artists/' + artist.id + '/calendar.json?apikey=' + config.API_SK;
-        const url = urlBase + path;
+        orderListArtistByEvents(artist);
 
-        callApis(url, function (event) {
-
-          toggleSpinner('false');
-
-          if (event.totalEntries > 0) {
-
-            const li = document.createElement('LI');
-            const text = document.createTextNode(artist.displayName);
-            li.appendChild(text);
-            ul.insertBefore(li, ul.firstChild);
-
-            const small = document.createElement('SMALL');
-            const totalEvents = document.createTextNode(event.totalEntries + ' eventos encontrados');
-            small.appendChild(totalEvents);
-            li.appendChild(small);
-
-            li.classList.add('list-artist-link');
-
-            document.querySelector('.list-artist-link').addEventListener('click', function () {
-              artistDetails(artist.id);
-            }, false);
-
-          } else {
-            const li = document.createElement('LI');
-            const text = document.createTextNode(artist.displayName);
-            li.appendChild(text);
-            ulNoEvents.appendChild(li);
-
-            const small = document.createElement('SMALL');
-            const totalEvents = document.createTextNode(event.totalEntries + ' eventos encontrados');
-            small.appendChild(totalEvents);
-            li.appendChild(small);
-          }
-        });
       });
     } else {
-      toggleSpinner('false');
+      toggleSpinner('hide');
+    }
+
+    function orderListArtistByEvents (artist) {
+      const path = 'artists/' + artist.id + '/calendar.json?apikey=' + config.API_SK;
+      const url = urlBase + path;
+
+      callApis(url, function (event) {
+
+        toggleSpinner('hide');
+
+        if (event.totalEntries > 0) {
+
+          const li = createTagAndSetStyle('LI', 'list-artist-link');
+          const text = document.createTextNode(artist.displayName);
+          li.appendChild(text);
+          ul.insertBefore(li, ul.firstChild);
+
+          const small = document.createElement('SMALL');
+          const totalEvents = document.createTextNode(event.totalEntries + ' eventos encontrados');
+          small.appendChild(totalEvents);
+          li.appendChild(small);
+
+          document.querySelector('.list-artist-link').addEventListener('click', function () {
+            artistDetails(artist.id);
+          }, false);
+
+        } else {
+          const li = document.createElement('LI');
+          const text = document.createTextNode(artist.displayName);
+          li.appendChild(text);
+          ulNoEvents.appendChild(li);
+
+          const small = document.createElement('SMALL');
+          const totalEvents = document.createTextNode(event.totalEntries + ' eventos encontrados');
+          small.appendChild(totalEvents);
+          li.appendChild(small);
+        }
+      });
     }
   }
 
