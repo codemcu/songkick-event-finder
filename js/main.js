@@ -4,7 +4,7 @@
 
   /**
    * @description convierte un día a formato local, (wednesday -> miércoles)
-   * @param {string} date - día a convertir
+   * @param {string} date - fecha formato (2018-12-07)
    * @return {Function} capitalizeFirstLetter
    */
   function convertDay(date) {
@@ -23,19 +23,18 @@
 
   /**
    * @description convierte la fecha del evento a formato local
-   * @param {string} date - fecha
+   * @param {string} date - fecha formato (2018-12-07)
    * @param {string} type - (día, mes o año)
-   * @returns {string} splitter - devuelve un day o posición del array depediendo del type
+   * @returns {string | number} string en el caso de que el type sea mount y number si no
    */
   function splitDate(date, type) {
-    const splitter = date.split('-');
+    const fullDate = new Date(date);
     if (type === 'year') {
-      return splitter[0];
+      return fullDate.getFullYear();
     } else if (type === 'month') {
-      let day = new Date(date).toLocaleDateString('es-ES', {month: 'long'});
-      return capitalizeFirstLetter(day);
-    } else {
-      return splitter[2];
+      return capitalizeFirstLetter(new Date(date).toLocaleDateString('es-ES', {month: 'long'}));
+    } else if (type === 'day') {
+      return fullDate.getDate();
     }
   }
 
