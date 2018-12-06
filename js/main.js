@@ -2,11 +2,21 @@
 
   const urlBase = 'https://api.songkick.com/api/3.0/';
 
+  /**
+   * @description convierte un día a formato local, (wednesday -> miércoles)
+   * @param {string} date - día a convertir
+   * @param {string} day - día a convertir
+   */
   function convertDay(date) {
     let day = new Date(date).toLocaleDateString('es-ES', {weekday: 'long'});
     return capitalizeDay(day);
   }
 
+  /**
+   * @description capitaliza el día de la semana
+   * @param {string} - day, día de semana
+   * @return {string} array convertido a string
+   */
   function capitalizeDay(day) {
     let array = day.split('');
     const firstLetter = day[0].toUpperCase();
@@ -14,6 +24,12 @@
     return array.join('');
   }
 
+  /**
+   * @description convierte la fecha del evento a formato local
+   * @param {string} date - fecha
+   * @param {string} type - (día, mes o año)
+   * @returns {string} splitter - devuelve un day o posición del array depediendo del type
+   */
   function splitDate(date, type) {
     const splitter = date.split('-');
     if (type === 'year') {
@@ -26,6 +42,12 @@
     }
   }
 
+  /**
+   * @description quita los dos ceros finales a la hora del evento (19:30:00)
+   * @param {string} time, hora del evento
+   * @return {string} hora sin los dos ceros finales (19:30)
+   * @see https://github.com/rwaldron/idiomatic.js/
+   */
   function formatTime (time) {
     if (time == null) { // take advantage of == type coercion
       return 'Hora por confirmar';
@@ -35,6 +57,11 @@
     }
   }
 
+  /**
+   * @description cierra el modal (display: none)
+   * @param {target: string} $event - elemento del DOM que será 'display: none'
+   * @return void
+   */
   function closeModal($event) {
     console.log($event.target.parentElement.parentElement.style.display = 'none');
   }
@@ -45,6 +72,15 @@
     (state === 'show') ? css.display = 'block' : css.display = 'none' ;
   }
 
+  /**
+   * @description pinta en un modal la ubicación del evento en Google Maps
+   * @param {string} idEvent - id que servirá para obtener las coordenadas del evento
+   * @param data.results.venue: array - array de todas las direcciones
+   * @param event.street - dirección del evento para el DOM
+   * @param google.maps.Map - API google maps
+   * @param google.maps.Marker - API google maps
+   * @return void
+   */
   function searchLocation(idEvent) {
 
     const eventDetails = document.querySelector('.event-details');
@@ -120,6 +156,13 @@
 
   }
 
+  /**
+   * @description crea una lista con todos los detalles de los eventos del artista
+   * @param {number} id - id del artista para buscar todos sus eventos relacionados
+   * @param data.totalEntries - numero total de resultados
+   * @param tem.start.date - fecha. Parametro para la funcion splitDate
+   * @return void
+   */
   function artistDetails(id) {
 
     toggleSpinner('show');
@@ -206,7 +249,14 @@
 
     });
   }
-  
+
+  /**
+   * @description crea la la lista de artistas (ul > li) que coincidan con la búsqueda
+   * @param {Response} data - respuesta del servidor
+   * @param data.results.artist - contiene el array con todos los artistas
+   * @param data.totalEntries - numero total de artistas encontrados
+   * @return void
+   */
   function createListArtist(data) {
 
     toggleSpinner('show');
@@ -286,6 +336,13 @@
     }
   }
 
+  /**
+   * @description coge el texto del input y le pasa ese valor a callApis para hacer una llamada AJAX
+   * @param {Element} input - input tipo tagName
+   * @param {Function} callback nque se ejecutará cuando el servidor responda con un 200
+   * @param {number} delay - delay para el disparador de la función
+   * @return void
+   */
   function searchEvents(input, callback, delay) {
     const path = 'search/artists.json?apikey=' + config.API_SK + '&query=';
     const url = urlBase + path;
@@ -322,6 +379,12 @@
     input = null;
   }
 
+  /**
+   * @description interfaz standard de XMLHttpRequest, podría no funcionar en navegadores antiguos
+   * @param {string} url - dirección de la API
+   * @param {Function} callback - función que se ejecutará después de recibir una respuesta satisfactoria del servidor
+   * @param xhr.resultsPage - contiene una key expecífica de la respuesta del servidor para pintar resultados
+   */
   function callApis(url, callback) {
     let xhr = new XMLHttpRequest();
     xhr.open('GET', url, true);
@@ -341,6 +404,9 @@
     xhr.send();
   }
 
+  /**
+   * @description Selecciono el elemento HTML (input) que me servirá para inicializar la aplicación de búsqueda de eventos
+   */
   let inputText = document.querySelector('.inputSearch');
   searchEvents(inputText, callApis, 400);
 })();
