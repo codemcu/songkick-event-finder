@@ -1,10 +1,12 @@
-(function () {
+(function(){
+
+  const urlBase = 'https://api.songkick.com/api/3.0/';
 
   function convertDay(date) {
     let day = new Date(date).toLocaleDateString('es-ES', {weekday: 'long'});
     return capitalizeDay(day);
   }
-  
+
   function capitalizeDay(day) {
     let array = day.split('');
     const firstLetter = day[0].toUpperCase();
@@ -77,7 +79,10 @@
     divMap.style.display = 'block';
     modalContent.appendChild(divMap);
 
-    callApis('https://api.songkick.com/api/3.0/venues/ ' + idEvent + '.json?apikey=' + config.API_SK, function (data) {
+    const path = 'venues/ ' + idEvent + '.json?apikey=' + config.API_SK;
+    const url = urlBase + path;
+
+    callApis(url, function (data) {
 
       console.log(data);
 
@@ -114,8 +119,10 @@
     const spinner = document.querySelector('.spinner');
     spinner.style.display = 'block';
 
-    callApis('https://api.songkick.com/api/3.0/artists/' + id + '/calendar.json?apikey=' + config.API_SK, function (data) {
-      console.log(data);
+    const path = 'artists/' + id + '/calendar.json?apikey=' + config.API_SK;
+    const url = urlBase + path;
+
+    callApis(url, function (data) {
 
       spinner.style.display = 'none';
 
@@ -188,12 +195,12 @@
         eventCityCountry.textContent = item.location.city;
         button.addEventListener('click', function () {
           searchLocation(item.venue.id);
+          button.disabled = true;
         }, false);
       });
 
     });
   }
-
 
   function createListArtist(data) {
 
@@ -232,7 +239,10 @@
 
       arrayResults.forEach(function (artist) {
 
-        callApis('https://api.songkick.com/api/3.0/artists/' + artist.id + '/calendar.json?apikey=' + config.API_SK, function (event) {
+        const path = 'artists/' + artist.id + '/calendar.json?apikey=' + config.API_SK;
+        const url = urlBase + path;
+
+        callApis(url, function (event) {
 
           spinner.style.display = 'none';
 
@@ -267,23 +277,22 @@
           }
         });
       });
-
     } else {
       spinner.style.display = 'none';
     }
   }
 
   function searchEvents(input, callback, delay) {
-    const api = {
-      API_ARTIST: 'https://api.songkick.com/api/3.0/search/artists.json?apikey=' + config.API_SK + '&query='
-    };
+    const path = 'search/artists.json?apikey=' + config.API_SK + '&query=';
+    const url = urlBase + path;
+
     const container = document.querySelector('.container');
     container.innerHTML = '';
 
     let timer = null;
     input.onkeyup = function ($event) {
       let string = '';
-      const condition = $event.which >= 48 && $event.which <= 90 || $event.which === 8;
+      const condition = $event.which >= 48 && $event.which <= 90 || $event.which === 8 || $event.which === 13;
       if (condition) {
         if ($event.target.value.length > 3) {
           string = $event.target.value;
@@ -292,7 +301,7 @@
           }
           timer = window.setTimeout(function () {
             timer = null;
-            callback(api.API_ARTIST + string, function (data) {
+            callback(url + string, function (data) {
 
               container.innerHTML = '';
               createListArtist(data);
@@ -315,16 +324,18 @@
     xhr.onreadystatechange = function () {
       if (xhr.readyState === 4) {
 
-        if (xhr.status === 200) {
+        if (xhr.status >= 200 && xhr.status <= 300 ) {
           xhr = JSON.parse(xhr.responseText);
           let data = xhr.resultsPage;
           callback(data);
+        } else {
+          const container = document.querySelector('.container');
+          container.innerHTML = `Error: ${xhr.status}`;
         }
       }
     };
     xhr.send();
   }
-
 
   let inputText = document.querySelector('.inputSearch');
   searchEvents(inputText, callApis, 400);
