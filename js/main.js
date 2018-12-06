@@ -209,58 +209,58 @@
       });
 
     });
-  }
 
-  /**
-   * @description crea la estructura con los detalles de cada evento divido por filas, (fecha, ciudad, y botón para buscarlo en el google maps)
-   * @param {Object} item - contiene los detalles del evento seleccionado
-   * @param {HTMLElement} ul - nodo contenedor
-   * @return void
-   * @private
-   */
-  function _createStructureEventDetail(item, ul) {
-    const li = document.createElement('LI');
+    /**
+     * @description crea la estructura con los detalles de cada evento divido por filas, (fecha, ciudad, y botón para buscarlo en el google maps)
+     * @param {Object} item - contiene los detalles del evento seleccionado
+     * @param {HTMLElement} ul - nodo contenedor
+     * @return void
+     * @private
+     */
+    function _createStructureEventDetail(item, ul) {
+      const li = document.createElement('LI');
 
-    const div1 = createTagAndSetStyle('DIV', 'event-date');
-    const eventDateYear = createTagAndSetStyle('DIV', 'event-date-year');
-    const eventDateMonth = createTagAndSetStyle('DIV', 'event-date-month');
-    const eventDateDay = createTagAndSetStyle('DIV', 'event-date-day');
+      const div1 = createTagAndSetStyle('DIV', 'event-date');
+      const eventDateYear = createTagAndSetStyle('DIV', 'event-date-year');
+      const eventDateMonth = createTagAndSetStyle('DIV', 'event-date-month');
+      const eventDateDay = createTagAndSetStyle('DIV', 'event-date-day');
 
-    const div2 = createTagAndSetStyle('DIV', 'event-date-details');
-    const eventDetailsHour = createTagAndSetStyle('DIV', 'event-date-details-hour');
-    const eventDetailsVenue = createTagAndSetStyle('DIV', 'event-date-details-venue');
-    const eventCityCountry = createTagAndSetStyle('DIV', 'event-date-city-country');
+      const div2 = createTagAndSetStyle('DIV', 'event-date-details');
+      const eventDetailsHour = createTagAndSetStyle('DIV', 'event-date-details-hour');
+      const eventDetailsVenue = createTagAndSetStyle('DIV', 'event-date-details-venue');
+      const eventCityCountry = createTagAndSetStyle('DIV', 'event-date-city-country');
 
-    const div3 = createTagAndSetStyle('DIV', 'event-location');
-    const button = document.createElement('BUTTON');
-    button.appendChild(document.createTextNode('Buscar en el mapa'));
+      const div3 = createTagAndSetStyle('DIV', 'event-location');
+      const button = document.createElement('BUTTON');
+      button.appendChild(document.createTextNode('Buscar en el mapa'));
 
-    div1.appendChild(eventDateDay);
-    div1.appendChild(eventDateMonth);
-    div1.appendChild(eventDateYear);
+      div1.appendChild(eventDateDay);
+      div1.appendChild(eventDateMonth);
+      div1.appendChild(eventDateYear);
 
-    div2.appendChild(eventDetailsHour);
-    div2.appendChild(eventDetailsVenue);
-    div2.appendChild(eventCityCountry);
+      div2.appendChild(eventDetailsHour);
+      div2.appendChild(eventDetailsVenue);
+      div2.appendChild(eventCityCountry);
 
-    div3.appendChild(button);
+      div3.appendChild(button);
 
-    li.appendChild(div1);
-    li.appendChild(div2);
-    li.appendChild(div3);
-    ul.appendChild(li);
+      li.appendChild(div1);
+      li.appendChild(div2);
+      li.appendChild(div3);
+      ul.appendChild(li);
 
-    eventDateYear.textContent = splitDate(item.start.date, 'year');
-    eventDateMonth.textContent = splitDate(item.start.date, 'month');
-    eventDateDay.textContent = splitDate(item.start.date, 'day');
+      eventDateYear.textContent = splitDate(item.start.date, 'year');
+      eventDateMonth.textContent = splitDate(item.start.date, 'month');
+      eventDateDay.textContent = splitDate(item.start.date, 'day');
 
-    eventDetailsHour.textContent = convertDay(item.start.date) + ' - ' + formatTime(item.start.time);
-    eventDetailsVenue.textContent = item.venue.displayName;
-    eventCityCountry.textContent = item.location.city;
-    button.addEventListener('click', function () {
-      searchLocation(item.venue.id);
-      button.disabled = true;
-    }, false);
+      eventDetailsHour.textContent = convertDay(item.start.date) + ' - ' + formatTime(item.start.time);
+      eventDetailsVenue.textContent = item.venue.displayName;
+      eventCityCountry.textContent = item.location.city;
+      button.addEventListener('click', function () {
+        searchLocation(item.venue.id);
+        button.disabled = true;
+      }, false);
+    }
   }
 
   /**
@@ -302,59 +302,57 @@
 
       arrayResults.forEach(function (artist) {
 
-        _orderListArtistByEvents(artist, ul, ulNoEvents);
+        _orderListArtistByEvents(artist);
 
       });
     } else {
       toggleSpinner('hide');
     }
 
-  }
+    /**
+     * @description coloca más arriba los artistas cuyo número total de eventos sea diferente a 0
+     * @param {Object} artist - contiene el nombre y el id del artista
+     * @return void
+     * @private
+     */
+    function _orderListArtistByEvents (artist) {
+      const path = 'artists/' + artist.id + '/calendar.json?apikey=' + config.API_SK;
+      const url = urlBase + path;
 
-  /**
-   * @description coloca más arriba los artistas con número total de eventos > 0 y debajo los que no
-   * @param {Object} artist - contiene el nombre y el id del artista
-   * @param {HTMLElement} ul - contenedor para los artistas con numero de eventos > 0
-   * @param {HTMLElement} ulNoEvents - contenedor para los artidtas cuyo número de eventos sea = 0
-   * @return void
-   * @private
-   */
-  function _orderListArtistByEvents (artist, ul, ulNoEvents) {
-    const path = 'artists/' + artist.id + '/calendar.json?apikey=' + config.API_SK;
-    const url = urlBase + path;
+      callApis(url, function (event) {
 
-    callApis(url, function (event) {
+        toggleSpinner('hide');
 
-      toggleSpinner('hide');
+        if (event.totalEntries > 0) {
 
-      if (event.totalEntries > 0) {
+          const li = createTagAndSetStyle('LI', 'list-artist-link');
+          const text = document.createTextNode(artist.displayName);
+          li.appendChild(text);
+          ul.insertBefore(li, ul.firstChild);
 
-        const li = createTagAndSetStyle('LI', 'list-artist-link');
-        const text = document.createTextNode(artist.displayName);
-        li.appendChild(text);
-        ul.insertBefore(li, ul.firstChild);
+          const small = document.createElement('SMALL');
+          const totalEvents = document.createTextNode(event.totalEntries + ' eventos encontrados');
+          small.appendChild(totalEvents);
+          li.appendChild(small);
 
-        const small = document.createElement('SMALL');
-        const totalEvents = document.createTextNode(event.totalEntries + ' eventos encontrados');
-        small.appendChild(totalEvents);
-        li.appendChild(small);
+          document.querySelector('.list-artist-link').addEventListener('click', function () {
+            artistDetails(artist.id);
+          }, false);
 
-        document.querySelector('.list-artist-link').addEventListener('click', function () {
-          artistDetails(artist.id);
-        }, false);
+        } else {
+          const li = document.createElement('LI');
+          const text = document.createTextNode(artist.displayName);
+          li.appendChild(text);
+          ulNoEvents.appendChild(li);
 
-      } else {
-        const li = document.createElement('LI');
-        const text = document.createTextNode(artist.displayName);
-        li.appendChild(text);
-        ulNoEvents.appendChild(li);
+          const small = document.createElement('SMALL');
+          const totalEvents = document.createTextNode(event.totalEntries + ' eventos encontrados');
+          small.appendChild(totalEvents);
+          li.appendChild(small);
+        }
+      });
+    }
 
-        const small = document.createElement('SMALL');
-        const totalEvents = document.createTextNode(event.totalEntries + ' eventos encontrados');
-        small.appendChild(totalEvents);
-        li.appendChild(small);
-      }
-    });
   }
 
   /**
