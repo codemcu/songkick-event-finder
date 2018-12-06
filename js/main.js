@@ -39,6 +39,12 @@
     console.log($event.target.parentElement.parentElement.style.display = 'none');
   }
 
+  function toggleSpinner(state) {
+    const spinner = document.querySelector('.spinner');
+    let css = spinner.style;
+    (state === 'show') ? css.display = 'block' : css.display = 'none' ;
+  }
+
   function searchLocation(idEvent) {
 
     const eventDetails = document.querySelector('.event-details');
@@ -116,15 +122,14 @@
 
   function artistDetails(id) {
 
-    const spinner = document.querySelector('.spinner');
-    spinner.style.display = 'block';
+    toggleSpinner('show');
 
     const path = 'artists/' + id + '/calendar.json?apikey=' + config.API_SK;
     const url = urlBase + path;
 
     callApis(url, function (data) {
 
-      spinner.style.display = 'none';
+      toggleSpinner('false');
 
       const listOfEvents = data.results.event;
 
@@ -201,11 +206,10 @@
 
     });
   }
-
+  
   function createListArtist(data) {
 
-    const spinner = document.querySelector('.spinner');
-    spinner.style.display = 'block';
+    toggleSpinner('show');
 
     const container = document.querySelector('.container');
     const events = document.createElement('DIV');
@@ -244,7 +248,7 @@
 
         callApis(url, function (event) {
 
-          spinner.style.display = 'none';
+          toggleSpinner('false');
 
           if (event.totalEntries > 0) {
 
@@ -278,7 +282,7 @@
         });
       });
     } else {
-      spinner.style.display = 'none';
+      toggleSpinner('false');
     }
   }
 
