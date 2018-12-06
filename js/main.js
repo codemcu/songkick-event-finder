@@ -74,7 +74,7 @@
   }
 
   /**
-   * @description pinta en un modal la ubicación del evento en Google Maps
+   * @description busca la ubicación del evento en los mapas de Google Maps
    * @param {string} idEvent - id que servirá para obtener las coordenadas del evento
    * @param data.results.venue: array - array de todas las direcciones
    * @param event.street - dirección del evento para el DOM
