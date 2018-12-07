@@ -70,7 +70,11 @@
   function toggleSpinner(state) {
     const spinner = document.querySelector('.spinner');
     let css = spinner.style;
-    (state === 'show') ? css.display = 'block' : css.display = 'none' ;
+    if (state === 'show') {
+      css.display = 'block';
+    } else {
+      css.display = 'none';
+    }
   }
   /**
    * @description crea un nodeElement y le asigna una clase de CSS
@@ -86,7 +90,7 @@
 
   /**
    * @description estructura los divs que tendrá el modal para el mapa y los datos del evento
-   * @param {string} idEvent - id que servirá para obtener las coordenadas del evento
+   * @param {number} idEvent - id que servirá para obtener las coordenadas del evento
    * @return void
    */
   function loadModal(idEvent) {
@@ -130,14 +134,14 @@
   }
 
   /**
-   * @description busca la ubicación del evento en los mapas de Google Maps
+   * @description busca los detalles del evento (dirección, teléfono, website)
    * @param {number} idEvent - id del evento que servirá para hacer la llamada AJAX
-   * @param {HTMLDivElement} divModal - contenedor de los detalles del evento y del mapa
-   * @param {HTMLDivElement} divMap - contenedor sollo del mapa de Google
-   * @param data.results.venue: array - array de todas las direcciones
-   * @param event.street - dirección del evento para el DOM
-   * @param google.maps.Map - API google maps
-   * @param google.maps.Marker - API google maps
+   * @param {HTMLElement} divModal - contenedor de los detalles del evento
+   * @param {HTMLElement} divMap - contenedor para el mapa de Google
+   * @param {Object} data.results.venue - objeto con detalles del evento
+   * @param {string} event.street - dirección
+   * @param {string} event.zip - codigo postal
+   * @param {string} event.website - website
    * @private
    */
   function _searchLocation(idEvent, divModal, divMap) {
@@ -153,23 +157,42 @@
         divModal.querySelector('h1').textContent = event.displayName;
         divModal.querySelector('h3').textContent = event.street + ' - ' + event.zip;
         let pes = divModal.querySelectorAll('p');
-        pes[0].textContent = event.phone;
-        pes[1].textContent = event.website;
-        pes[2].textContent = event.city.country.displayName;
+        for (let i = 0; i < pes.length; i++) {
+          if (i === 0) {
+            pes[i].textContent = event.phone;
+          } else if (i === 1) {
+            pes[i].textContent = event.website;
+          } else if (i === 2) {
+            pes[i].textContent = event.city.country.displayName;
+          }
+        }
 
-        const location = {lat: event.lat, lng: event.lng};
-        const map = new google.maps.Map(divMap, {
-          zoom: 12,
-          center: location
-        });
-        const marker = new google.maps.Marker({
-          position: location,
-          map: map,
-          title: event.street
-        });
+        _googleMaps(event, divMap);
+
       } else {
         divModal.firstElementChild.children[1].textContent = 'No podemos mostrar la ubicación en el mapa';
       }
+    });
+  }
+
+  /**
+   * @description pinta la ubicación y su marcador en el mapa de google
+   * @param {Object} event - contiene detalles del evento
+   * @param {HTMLElement} divMap - contenedor para los mapas
+   * @param google.maps.Map - API google maps
+   * @param google.maps.Marker - API google maps
+   * @private
+   */
+  function _googleMaps(event, divMap) {
+    const location = {lat: event.lat, lng: event.lng};
+    const map = new google.maps.Map(divMap, {
+      zoom: 12,
+      center: location
+    });
+    const marker = new google.maps.Marker({
+      position: location,
+      map: map,
+      title: event.street
     });
   }
 
@@ -373,10 +396,12 @@
 
     const container = document.querySelector('.container');
     container.innerHTML = '';
+    container.classList.remove('warning');
 
     let timer = null;
     input.onkeyup = function ($event) {
       let string = '';
+      //numeros, letras, backspace, enter
       const condition = $event.which >= 48 && $event.which <= 90 || $event.which === 8 || $event.which === 13;
       if (condition) {
         if ($event.target.value.length > 3) {
@@ -389,12 +414,16 @@
             callback(url + string, function (data) {
 
               container.innerHTML = '';
+              container.classList.remove('warning');
               createListArtist(data);
 
             });
           }, delay);
         } else if ($event.target.value === '') {
           container.innerHTML = '';
+        } else {
+          container.innerHTML = 'Escribe al menos 3 caracteres';
+          container.classList.add('warning');
         }
 
       }
