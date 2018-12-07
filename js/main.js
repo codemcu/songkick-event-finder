@@ -173,27 +173,27 @@
         divModal.firstElementChild.children[1].textContent = 'No podemos mostrar la ubicación en el mapa';
       }
     });
-  }
 
-  /**
-   * @description pinta la ubicación y su marcador en el mapa de google
-   * @param {Object} event - contiene detalles del evento
-   * @param {HTMLElement} divMap - contenedor para los mapas
-   * @param google.maps.Map - API google maps
-   * @param google.maps.Marker - API google maps
-   * @private
-   */
-  function _googleMaps(event, divMap) {
-    const location = {lat: event.lat, lng: event.lng};
-    const map = new google.maps.Map(divMap, {
-      zoom: 12,
-      center: location
-    });
-    const marker = new google.maps.Marker({
-      position: location,
-      map: map,
-      title: event.street
-    });
+    /**
+     * @description pinta la ubicación y su marcador en el mapa de google
+     * @param {Object} event - contiene detalles del evento
+     * @param {HTMLElement} divMap - contenedor para los mapas
+     * @param google.maps.Map - API google maps
+     * @param google.maps.Marker - API google maps
+     * @private
+     */
+    function _googleMaps(event, divMap) {
+      const location = {lat: event.lat, lng: event.lng};
+      const map = new google.maps.Map(divMap, {
+        zoom: 12,
+        center: location
+      });
+      const marker = new google.maps.Marker({
+        position: location,
+        map: map,
+        title: event.street
+      });
+    }
   }
 
   /**
