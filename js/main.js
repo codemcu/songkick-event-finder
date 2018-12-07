@@ -59,7 +59,7 @@
    * @return void
    */
   function closeModal($event) {
-    console.log($event.target.parentElement.parentElement.style.display = 'none');
+    document.querySelector('.modal').remove();
   }
 
   /**
@@ -85,32 +85,25 @@
   }
 
   /**
-   * @description busca la ubicación del evento en los mapas de Google Maps
+   * @description estructura los divs que tendrá el modal para el mapa y los datos del evento
    * @param {string} idEvent - id que servirá para obtener las coordenadas del evento
-   * @param data.results.venue: array - array de todas las direcciones
-   * @param event.street - dirección del evento para el DOM
-   * @param google.maps.Map - API google maps
-   * @param google.maps.Marker - API google maps
    * @return void
    */
-  function searchLocation(idEvent) {
+  function loadModal(idEvent) {
 
     const eventDetails = document.querySelector('.event-details');
 
-    const divModal = document.createElement('DIV');
-    divModal.setAttribute('class', 'modal');
-    divModal.style.display = 'block';
+    const divModal = createTagAndSetStyle('DIV', 'modal');
     eventDetails.appendChild(divModal);
 
     const modal = document.querySelector('.modal');
-    const divModalContent = document.createElement('DIV');
-    divModalContent.setAttribute('class', 'modal-content');
+
+    const divModalContent = createTagAndSetStyle('DIV', 'modal-content');
     modal.appendChild(divModalContent);
 
     const modalContent = document.querySelector('.modal-content');
 
-    const span = document.createElement('SPAN');
-    span.setAttribute('class', 'close');
+    const span = createTagAndSetStyle('SPAN', 'close');
     span.addEventListener('click', closeModal, false);
     span.textContent = 'X';
     modalContent.appendChild(span);
@@ -128,17 +121,30 @@
     modalContent.appendChild(p2);
     modalContent.appendChild(p3);
 
-    const divMap = document.createElement('DIV');
+    const divMap = createTagAndSetStyle('DIV', 'map');
     divMap.setAttribute('id', 'map');
-    divMap.style.display = 'block';
     modalContent.appendChild(divMap);
 
+    _searchLocation(idEvent, divModal, divMap);
+
+  }
+
+  /**
+   * @description busca la ubicación del evento en los mapas de Google Maps
+   * @param {number} idEvent - id del evento que servirá para hacer la llamada AJAX
+   * @param {HTMLDivElement} divModal - contenedor de los detalles del evento y del mapa
+   * @param {HTMLDivElement} divMap - contenedor sollo del mapa de Google
+   * @param data.results.venue: array - array de todas las direcciones
+   * @param event.street - dirección del evento para el DOM
+   * @param google.maps.Map - API google maps
+   * @param google.maps.Marker - API google maps
+   * @private
+   */
+  function _searchLocation(idEvent, divModal, divMap) {
     const path = 'venues/ ' + idEvent + '.json?apikey=' + config.API_SK;
     const url = urlBase + path;
 
     callApis(url, function (data) {
-
-      console.log(data);
 
       const event = data.results.venue;
 
@@ -165,7 +171,6 @@
         divModal.firstElementChild.children[1].textContent = 'No podemos mostrar la ubicación en el mapa';
       }
     });
-
   }
 
   /**
@@ -257,8 +262,8 @@
       eventDetailsVenue.textContent = item.venue.displayName;
       eventCityCountry.textContent = item.location.city;
       button.addEventListener('click', function () {
-        searchLocation(item.venue.id);
-        button.disabled = true;
+        loadModal(item.venue.id);
+        // button.disabled = true;
       }, false);
     }
   }
