@@ -405,7 +405,7 @@
       const condition = $event.which >= 48 && $event.which <= 90 || $event.which === 8 || $event.which === 13;
       if (condition) {
         if ($event.target.value.length > 3) {
-          string = $event.target.value;
+          string = $event.target.value.trim();
           if (timer) {
             window.clearTimeout(timer);
           }
