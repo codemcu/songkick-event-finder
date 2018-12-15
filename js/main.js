@@ -402,9 +402,10 @@
     input.onkeyup = function ($event) {
       let string = '';
       //numeros, letras, backspace, enter
-      const condition = $event.which >= 48 && $event.which <= 90 || $event.which === 8 || $event.which === 13;
-      if (condition) {
-        if ($event.target.value.length > 3) {
+      const conditions = [$event.which >= 48 && $event.which <= 90, $event.which === 8, $event.which === 13];
+      const isConditionTruthy = conditions.some(item => item === true);
+      if ($event.target.value.length > 3) {
+        if (isConditionTruthy) {
           string = $event.target.value.trim();
           if (timer) {
             window.clearTimeout(timer);
@@ -421,11 +422,10 @@
           }, delay);
         } else if ($event.target.value === '') {
           container.innerHTML = '';
-        } else {
-          container.innerHTML = 'Escribe al menos 3 caracteres';
-          container.classList.add('warning');
         }
-
+      } else {
+        container.innerHTML = 'Escribe al menos 3 caracteres';
+        container.classList.add('warning');
       }
 
     };
