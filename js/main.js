@@ -145,7 +145,7 @@
    * @private
    */
   function _searchLocation(idEvent, divModal, divMap) {
-    const path = 'venues/ ' + idEvent + '.json?apikey=' + config.API_SK;
+    const path = `venues/${idEvent}.json?apikey=${config.API_SK}`;
     const url = urlBase + path;
 
     callApis(url, function (data) {
@@ -207,7 +207,7 @@
 
     toggleSpinner('show');
 
-    const path = 'artists/' + id + '/calendar.json?apikey=' + config.API_SK;
+    const path = `artists/${id}/calendar.json?apikey=${config.API_SK}`;
     const url = urlBase + path;
 
     callApis(url, function (data) {
@@ -344,7 +344,7 @@
      * @private
      */
     function _orderListArtistByEvents (artist) {
-      const path = 'artists/' + artist.id + '/calendar.json?apikey=' + config.API_SK;
+      const path = `artists/${artist.id}/calendar.json?apikey=${config.API_SK}`;
       const url = urlBase + path;
 
       callApis(url, function (event) {
@@ -391,7 +391,7 @@
    * @return void
    */
   function searchEvents(input, callback, delay) {
-    const path = 'search/artists.json?apikey=' + config.API_SK + '&query=';
+    const path = `search/artists.json?apikey=${config.API_SK}&query=`;
     const url = urlBase + path;
 
     const container = document.querySelector('.container');
