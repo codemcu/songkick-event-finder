@@ -65,16 +65,12 @@
   /**
    * @description muestra u oculta el spinner con css dependiendo de si el state es show o no
    * @param {string} si es show, aplica 'block' a display, en otro caso, 'none'
-   * @return void
+   * @return {string} propiedad de css
    */
   function toggleSpinner(state) {
     const spinner = document.querySelector('.spinner');
     let css = spinner.style;
-    if (state === 'show') {
-      css.display = 'block';
-    } else {
-      css.display = 'none';
-    }
+    return (state === 'show') ? css.display = 'block' : css.display = 'none';
   }
   /**
    * @description crea un nodeElement y le asigna una clase de CSS
